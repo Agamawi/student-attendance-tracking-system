@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-md-9">
+        <h1>Welcome {{admin.user.first_name}} {{admin.user.last_name}}!</h1>
+        {% if not admin.super_admin %}<h4>{{admin.school.name}}, {{admin.school.building_no}} {{admin.school.street}} {{admin.school.city}}</h4> {% endif %}
+    </div>
+    {% if not admin.super_admin %}
+    {% if is_home %}
+    <div class="col-md-3">
+        <h4>School start time:</h4>
+        <form action="/changeschoolstarttime" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="time" class="form-control" name="school_start_time" value="{{admin.school.start_time|time:'h:i'}}">
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-info" name="button">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>

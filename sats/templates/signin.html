@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="jumbotron">
+                <h1>Student Attendance Tracking System</h1>
+                <hr>
+                {% if errors %}
+                <div class="alert alert-danger">
+                    <p>{{errors}}</p>
+                </div>
+                {% endif %}
+                <form method="post" action="/signin">
+                    {% csrf_token %}
+                    <label><b>Email</b></label>
+                    <input type="text" class="form-control" placeholder="Enter Email" name="email">
+                	<br>
+                    <label><b>Password</b></label>
+                    <input type="password" class="form-control"  placeholder="Enter Password" name="password">
+                	<br>
+                	<button type="submit" class="btn btn-default">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

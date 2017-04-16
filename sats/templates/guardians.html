@@ -1,0 +1,94 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block content %} {% include 'navbar.html' %}
+
+<div class="container">
+    {% include 'header.html' %}
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Guardians</h2>
+            <div class="pull-right">
+                <button onclick="prep_add_modal('#add_modal_body')" data-toggle="modal" data-target="#add_modal" type="button" class="btn btn-success">Add</button>
+            </div>
+            <div id="guardians_table">
+                <table class="table table-striped">
+                	<tr>
+                		<th>Name</th>
+                		<th>Relationship</th>
+                		<th>Occupation</th>
+                        <th></th>
+                	</tr>
+                    {% for guardian in guardians %}
+                	<tr>
+                		<td>{{guardian.user.last_name}}, {{guardian.user.first_name}}</td>
+                		<td>{{guardian.relationship}}</td>
+                		<td>{{guardian.occupation}}</td>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="">
+                                <button onclick="prep_show_modal('#show_modal_body', '{{guardian.user.last_name}}', '{{guardian.user.first_name}}', '{{guardian.relationship}}', '{{guardian.occupation}}')" data-toggle="modal" data-target="#show_modal" type="button" class="btn btn-primary">Show</button>
+                                <button onclick="prep_edit_modal('#edit_modal_body', '{{guardian.user.last_name}}', '{{guardian.user.first_name}}', '{{guardian.relationship}}', '{{guardian.occupation}}', '{{guardian.id}}')" data-toggle="modal" data-target="#edit_modal" type="button" class="btn btn-info">Edit</button>
+                                <button onclick="delete_entry('{{guardian.id}}')" type="button" class="btn btn-danger">Delete</button>
+                            </div>
+                        </td>
+                	</tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="show_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Show Entry</h4>
+      </div>
+      <div id="show_modal_body" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Edit Entry</h4>
+      </div>
+      <div id="edit_modal_body" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="save_edit()">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="add_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Entry</h4>
+      </div>
+      <div id="add_modal_body" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="add_entry()">Add Entry</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/guardians.js' %}"></script>
+{% endblock %}

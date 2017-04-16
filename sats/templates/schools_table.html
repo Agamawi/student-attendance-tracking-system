@@ -1,0 +1,20 @@
+<h2>All Schools<h2>
+
+<table>
+	<tr>
+		<th>Name</th>
+		<th>Building no.</th>
+		<th>Street</th>
+		<th>City</th>
+		<th>Zone no.</th>
+	</tr>
+{% for school in schools %}
+	<tr>
+		<td>{{school.name}}</td>
+		<td>{{school.building_no}}</td>
+		<td>{{school.street}}</td>
+		<td>{{school.city}}</td>
+		<td>{{school.zone_no}}</td>
+	</tr>
+{% endfor %}
+</table>

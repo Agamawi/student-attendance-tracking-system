@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Sniffer Update</title>
+</head>
+
+<body>
+	<h1>Sniffer Update</h1>
+	{% if success_count > 0 or fail_count > 0 %}
+	<div class="message">
+		<p>Successfully updated {{success_count}} tags. {{fail_count}} failed.<p>
+	</div>
+	{% endif %}
+	<hr>
+	<form method="post" action="/snifferupdate">
+		{% csrf_token %}
+		<textarea type="text" name="mac_addresses" placeholder="MAC Addresses"></textarea>
+		<input type="number" name="sniffer_no" placeholder="Sniffer #"></input>
+		<br>
+		<button type="submit">Submit</button>
+	</form>
+</body>
+
+</html>

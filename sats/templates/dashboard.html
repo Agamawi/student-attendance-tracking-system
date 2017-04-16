@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block content %} {% include 'navbar.html' %}
+
+<div class="container">
+    {% include 'header.html' %}
+    <hr>
+    {% if not admin.super_admin %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Absent Children</h2>
+            <div id="absent_children_table">
+                {% include 'absent_children_table.html' %}
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Late Children</h2>
+            <div id="late_children_table">
+                {% include 'late_children_table.html' %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %} {% block scripts %}
+{% if not admin.super_admin %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endif %}
+{% endblock %}

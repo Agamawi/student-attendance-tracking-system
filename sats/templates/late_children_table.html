@@ -1,0 +1,24 @@
+{% if late_children %}
+<table class="table table-striped">
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Grade</th>
+        <th>Section</th>
+        <th>Time of Arrival</th>
+    </tr>
+    {% for child in late_children %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{child.last_name}}, {{child.first_name}}</td>
+        <td>{{child.grade}}</td>
+        <td>{{child.section}}</td>
+        <td>{{child.time_of_arrival|time:"h:i A"}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<div class="alert alert-info">
+    <p>No children are late.</p>
+</div>
+{% endif %}

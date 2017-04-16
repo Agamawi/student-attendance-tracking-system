@@ -1,0 +1,16 @@
+<h2>All Admins<h2>
+
+<table>
+	<tr>
+		<th>Name</th>
+		<th>Contact number</th>
+		<th>Superuser?</th>
+	</tr>
+{% for admin in admins %}
+	<tr>
+		<td>{{admin.user.last_name}}, {{admin.user.first_name}}</td>
+		<td>{{admin.contact_number}}</td>
+		<td>{{admin.super_admin}}</td>
+	</tr>
+{% endfor %}
+</table>

@@ -1,0 +1,32 @@
+<table class="table table-striped">
+	<tr>
+		<th>Name</th>
+		<th>Age</th>
+		<th>Grade</th>
+		<th>Section</th>
+		<th>Location</th>
+		<th>Last seen</th>
+		<th>School</th>
+		<th>Tag</th>
+		<th></th>
+	</tr>
+{% for child in children %}
+	<tr>
+		<td>{{child.last_name}}, {{child.first_name}}</td>
+		<td>{{child.age}}</td>
+		<td>{{child.grade}}</td>
+		<td>{{child.section}}</td>
+		<td>{{child.location}}</td>
+		<td>{{child.last_seen}}</td>
+		<td>{{child.school}}</td>
+		<td>{{child.tag}}</td>
+		<td>
+			<div class="btn-group" role="group" aria-label="">
+				<button onclick="prep_show_modal('#show_modal_body', '{{child.last_name}}', '{{child.first_name}}', '{{child.age}}', '{{child.grade}}', '{{child.section}}', '{{child.location}}', '{{child.last_seen}}', '{{child.school}}', '{{child.tag}}')" data-toggle="modal" data-target="#show_modal" type="button" class="btn btn-primary">Show</button>
+				<button onclick="prep_edit_modal('#edit_modal_body', '{{child.last_name}}', '{{child.first_name}}', '{{child.age}}', '{{child.grade}}', '{{child.section}}', '{{child.location}}', '{{child.last_seen}}', '{{child.school}}' ,'{{child.school_id}}', '{{child.tag}}','{{child.id}}')" data-toggle="modal" data-target="#edit_modal" type="button" class="btn btn-info">Edit</button>
+				<button onclick="delete_entry('{{child.id}}')" type="button" class="btn btn-danger">Delete</button>
+			</div>
+		</td>
+	</tr>
+{% endfor %}
+</table>
