@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.utils.html import escape
 import datetime
 from django.views.decorators.csrf import csrf_exempt
-
+from django.utils import timezone
 from models import *
 
 # Create your views here.
@@ -26,6 +26,13 @@ def index(request):
             guardian = Guardian.objects.get(user=request.user)
             children = list(map(lambda x: x.child,
                                 ChildGuardian.objects.filter(guardian=guardian)))
+            context = {"guardian": {
+                            "first_name": guardian.user.first_name,
+                            "last_name": guardian.user.last_name,
+                            "email": guardian.user.email,
+                            "relationship": guardian.relationship,
+                            "occupation": guardian.occupation
+            }}
             guardian_children = {"children": []}
             for child in children:
                 child_data = {"first_name": child.first_name,
@@ -45,7 +52,8 @@ def index(request):
                     child_data["location"] = tag_updates[0].sniffer.name
                     child_data["last_seen"] = tag_updates[0].time_stamp
                 guardian_children["children"].append(child_data)
-            return JsonResponse(guardian_children)
+                context["children"] = guardian_children
+            return JsonResponse(context)
         except:
             return HttpResponseRedirect(reverse("dashboard"))
 
@@ -172,6 +180,10 @@ def children(request):
             else:
                 child["location"] = tag_updates[0].sniffer.name
                 child["last_seen"] = tag_updates[0].time_stamp
+                if ((timezone.now() - tag_updates[0].time_stamp).total_seconds() >= 15):
+                    child["in_out"] = "OUT"
+                else:
+                    child["in_out"] = "IN"
             children.append(child)
         context["children"] = children
         context["schools"] = School.objects.all()

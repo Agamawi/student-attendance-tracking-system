@@ -5,6 +5,7 @@
         <th>Name</th>
         <th>Grade</th>
         <th>Section</th>
+        <th>Called</th>
     </tr>
     {% for child in absent_children %}
     <tr>
@@ -12,6 +13,7 @@
         <td>{{child.last_name}}, {{child.first_name}}</td>
         <td>{{child.grade}}</td>
         <td>{{child.section}}</td>
+        <td><input type="checkbox"></td>
     </tr>
     {% endfor %}
 </table>
