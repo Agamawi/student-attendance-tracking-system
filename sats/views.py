@@ -12,10 +12,11 @@ import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from models import *
+from labeeb_wrapper import get_data
+from time import sleep
+from django.conf import settings
 
 # Create your views here.
-
-
 def redirect(request):
     return HttpResponseRedirect(reverse("index"))
 
@@ -33,6 +34,23 @@ def index(request):
                             "relationship": guardian.relationship,
                             "occupation": guardian.occupation
             }}
+            
+            # get all the tags for the children of the guardian
+            all_tags = map(lambda x: TagUpdate.objects.filter(tag=x.tag), children)
+            new_all_tags = []
+            for lst in all_tags:
+                new_all_tags += lst
+            # parse all the updates 
+            tag_updates = []
+            context['history'] = []
+            for tag in new_all_tags:
+                tag_updates.append({
+                    "tag": tag.tag.mac_address,
+                    "sniffer": tag.sniffer.name,
+                    "time_stamp": str(tag.time_stamp)
+                    })
+            context['history'] = tag_updates
+
             guardian_children = {"children": []}
             for child in children:
                 child_data = {"first_name": child.first_name,
@@ -54,7 +72,7 @@ def index(request):
                 guardian_children["children"].append(child_data)
                 context["children"] = guardian_children
             return JsonResponse(context)
-        except:
+        except Exception as e:
             return HttpResponseRedirect(reverse("dashboard"))
 
     return HttpResponseRedirect(reverse("signin"))
@@ -593,3 +611,80 @@ def admin_delete(request):
         return JsonResponse({"success": True})
     except:
         return JsonResponse({"success": False})
+
+
+# function will be called every x seconds to fetch the new data 
+def fetch_update():
+    if not settings.LOADED_DATA:
+        print "load the data first from the Labeeb IoT at /fetch_and_update"
+        return 1
+    data = get_data(datetime.datetime.today())
+    # create all the entries for the updates 
+    for entry in data:
+        all_tags = entry['stringValue'].split("!")
+        # iterate over the tags 
+        for tag in all_tags:
+            current_sniffer = Sniffer.objects.filter(name=entry['deviceId'])[0]
+            current_tag = Tag.objects.filter(mac_address=tag)[0]
+            new_tagupdate = TagUpdate(tag=current_tag, sniffer=current_sniffer)
+            new_tagupdate.save()
+    
+    print "updated the model..."
+    sleep(10)
+
+# populate the db 
+@csrf_exempt
+def fetch_and_update(request): 
+    if not request.user.is_superuser:
+        redirect(request)
+    data = get_data()
+    result = {}
+    unique_tags = {}
+    for row in data:
+        key = row['deviceId']
+        if key in result.keys():
+            result[key].append(row)
+        else:
+            result[key] = [row]
+        tags = row['stringValue'].split("!")
+        # get all the unique tags 
+        for tag in tags:
+            if tag not in unique_tags.keys():
+                unique_tags[tag] = 1
+
+    # attach all sniffers to the same school 
+    school = School.objects.all()[0]
+    # create all the sniffers 
+    for sniffer in result.keys():
+        new_sniffer = Sniffer(name=sniffer, number=1234, school=school)
+        new_sniffer.save()
+    # create all the tags 
+    for tag in unique_tags: 
+        new_tag = Tag(mac_address=tag)
+        new_tag.save()
+    # create all the entries for the updates 
+    for entry in data:
+        all_tags = entry['stringValue'].split("!")
+        # iterate over the tags 
+        for tag in all_tags:
+            current_sniffer = Sniffer.objects.filter(name=entry['deviceId'])[0]
+            current_tag = Tag.objects.filter(mac_address=tag)[0]
+            new_tagupdate = TagUpdate(tag=current_tag, sniffer=current_sniffer, time_stamp=entry['storeTime'])
+            new_tagupdate.save()
+
+    settings.LOADED_DATA = True
+    
+
+    return HttpResponseRedirect(reverse("start_autoload"))
+
+@csrf_exempt
+def start_autoload(request):
+    if not request.user.is_superuser:
+        redirect(request)
+    settings.LOADED_DATA = True
+    while True:
+        fetch_update()
+
+    return JsonResponse({"success": "The server is now autoloading"})
+
+

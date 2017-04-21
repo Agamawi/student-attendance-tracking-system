@@ -32,6 +32,8 @@ DEBUG = eval(os.environ.get("HEROKUDEBUG", "True"))
 
 ALLOWED_HOSTS = ["*"]
 
+# Flag if you have loaded the data from the server for the first time 
+LOADED_DATA = False
 
 # Application definition
 
@@ -114,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Qatar'
 
 USE_I18N = True
 

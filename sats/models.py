@@ -95,3 +95,5 @@ class TagUpdate(models.Model):
 
 	def __unicode__(self):
 		return str(self.time_stamp)
+
+ 		

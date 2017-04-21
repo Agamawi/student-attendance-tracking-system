@@ -28,6 +28,9 @@ urlpatterns = [
 	url(r'adminedit$', views.admin_edit, name="admin_edit"),
 	url(r'admindelete$', views.admin_delete, name="admin_delete"),
 
+    url(r'fetch_and_update$', views.fetch_and_update, name="fetch_and_update"),
+    url(r'start_autoload$', views.start_autoload, name="start_autoload"),
+
     # AJAX and forms
     url(r'refreshabsentlatechildren$', views.refresh_absent_late_children,
         name="refresh_absent_late_children"),
