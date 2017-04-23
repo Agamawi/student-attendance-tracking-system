@@ -274,14 +274,13 @@ def refresh_children(request):
     try:
         school_children = Child.objects.filter(school=admin.school)
         children = []
-        for child in school_children:
-            tag_updates = TagUpdate.objects.filter(tag=child.tag,
-                                                   time_stamp__date=datetime.date.today()).order_by("-time_stamp")
-            child = child.__dict__
+        for child1 in school_children:
+            tag_updates = TagUpdate.objects.filter(tag=child1.tag, time_stamp__date=datetime.date.today()).order_by("-time_stamp")
 
-            child["school"] = child.school.name
-            child["school_id"] = child.school.id
-            child["tag"] = child.tag.mac_address
+            child = child1.__dict__
+            child["school"] = child1.school.name
+            child["school_id"] = child1.school.id
+            child["tag"] = child1.tag.mac_address
             
             if len(tag_updates) == 0:
                 child["location"] = "Not present"
@@ -289,12 +288,16 @@ def refresh_children(request):
             else:
                 child["location"] = tag_updates[0].sniffer.name
                 child["last_seen"] = tag_updates[0].time_stamp
+                if ((timezone.now() - tag_updates[0].time_stamp).total_seconds() >= 15):
+                    child["in_out"] = "OUT"
+                else:
+                    child["in_out"] = "IN"
             children.append(child)
         context["children"] = children
         response["children"] = render_to_string("children_table.html", context,
                                                 request)
         return JsonResponse(response)
-    except:
+    except Exception as e:
         response["errors"] = 3
         return JsonResponse(response)
 
@@ -618,16 +621,23 @@ def fetch_update():
     if not settings.LOADED_DATA:
         print "load the data first from the Labeeb IoT at /fetch_and_update"
         return 1
-    data = get_data(datetime.datetime.today())
+
+    new_time = datetime.datetime.today() - datetime.timedelta(seconds=10)
+    data = get_data(new_time)
+    # print "Data: ", data
     # create all the entries for the updates 
     for entry in data:
         all_tags = entry['stringValue'].split("!")
+        sniffers = []
         # iterate over the tags 
         for tag in all_tags:
+            if tag in sniffers:
+                continue
             current_sniffer = Sniffer.objects.filter(name=entry['deviceId'])[0]
             current_tag = Tag.objects.filter(mac_address=tag)[0]
             new_tagupdate = TagUpdate(tag=current_tag, sniffer=current_sniffer)
             new_tagupdate.save()
+            sniffers.append(tag)
     
     print "updated the model..."
     sleep(10)

@@ -1,5 +1,6 @@
 import requests 
 import json
+import re
 
 url = "http://mea.labeeb-iot.com/uam_m2m/rest/UamCommunicationInterface"
 
@@ -22,6 +23,8 @@ def get_data(time=None):
 	data = {}
 	if time != None:
 		new_time = str(time).replace(" ", "T")
+		index = str(new_time).index('.') + 4
+		new_time = str(new_time)[:index] + "+03:00"
 		data = {'fromDate': new_time}
 
 	response = requests.post(url+"/getData", json=data, cookies=session_id)
