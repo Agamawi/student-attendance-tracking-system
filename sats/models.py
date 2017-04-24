@@ -46,7 +46,7 @@ class Guardian(models.Model):
 
 class Tag(models.Model):
 
-	mac_address = models.CharField(max_length=64)
+	mac_address = models.CharField(max_length=64, unique=True)
 
 
 	def __unicode__(self):
@@ -79,7 +79,7 @@ class ChildGuardian(models.Model):
 
 class Sniffer(models.Model):
 
-	name = models.CharField(max_length=64)
+	name = models.CharField(max_length=64, unique=True)
 	number = models.IntegerField()
 	school = models.ForeignKey(School)
 

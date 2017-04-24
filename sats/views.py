@@ -20,7 +20,7 @@ from django.conf import settings
 def redirect(request):
     return HttpResponseRedirect(reverse("index"))
 
-
+@csrf_exempt
 def index(request):
     if request.user.is_authenticated():
         try:
@@ -74,7 +74,7 @@ def index(request):
             return JsonResponse(context)
         except Exception as e:
             return HttpResponseRedirect(reverse("dashboard"))
-
+ 
     return HttpResponseRedirect(reverse("signin"))
 
 
@@ -135,9 +135,11 @@ def dashboard(request):
     # if user is guardian, get list of guardian's children
     if context["guardian"] is not None:
         children = ChildGuardian.objects.filter(guardian=guardian)
+        print children
         context["children"] = []
         for child in children:
-            context["children"].append(Child.objects.get(id=child.id))
+            # Child.objects.filter(id=child.id)
+            context["children"].append(child)
 
     # if user is school admin, calculate list of absent students and
     # late students
@@ -409,8 +411,11 @@ def child_add(request):
         school_id = escape(request.POST["school"])
         school = School.objects.get(id=school_id)
         tag_mac_address = escape(request.POST["tag"])
-
-        tag = Tag(mac_address=tag_mac_address)
+        tag = None
+        try:
+            tag = Tag.objects.filter(mac_address=tag_mac_address)[0]
+        except:
+            tag = Tag(mac_address=tag_mac_address)
         tag.save()
 
         child = Child(first_name=first_name, last_name=last_name, tag=tag,
@@ -633,12 +638,15 @@ def fetch_update():
         for tag in all_tags:
             if tag in sniffers:
                 continue
-            current_sniffer = Sniffer.objects.filter(name=entry['deviceId'])[0]
-            current_tag = Tag.objects.filter(mac_address=tag)[0]
-            new_tagupdate = TagUpdate(tag=current_tag, sniffer=current_sniffer)
-            new_tagupdate.save()
-            sniffers.append(tag)
-    
+            try:
+                current_sniffer = Sniffer.objects.filter(name=entry['deviceId'])[0]
+                current_tag = Tag.objects.filter(mac_address=tag)[0]
+                new_tagupdate = TagUpdate(tag=current_tag, sniffer=current_sniffer)
+                new_tagupdate.save()
+                sniffers.append(tag)
+            except Exception as e:
+                pass
+
     print "updated the model..."
     sleep(10)
 
@@ -664,14 +672,23 @@ def fetch_and_update(request):
 
     # attach all sniffers to the same school 
     school = School.objects.all()[0]
+
     # create all the sniffers 
     for sniffer in result.keys():
-        new_sniffer = Sniffer(name=sniffer, number=1234, school=school)
-        new_sniffer.save()
+        try:
+            new_sniffer = Sniffer(name=sniffer, number=1234, school=school)
+            new_sniffer.save()
+        except:
+            pass
+
     # create all the tags 
-    for tag in unique_tags: 
-        new_tag = Tag(mac_address=tag)
-        new_tag.save()
+    for tag in unique_tags:
+        try:
+            new_tag = Tag(mac_address=tag)
+            new_tag.save()
+        except:
+            pass
+
     # create all the entries for the updates 
     for entry in data:
         all_tags = entry['stringValue'].split("!")
@@ -684,7 +701,7 @@ def fetch_and_update(request):
 
     settings.LOADED_DATA = True
     
-
+    print "fetched and updated the db"
     return HttpResponseRedirect(reverse("start_autoload"))
 
 @csrf_exempt
