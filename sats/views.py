@@ -59,8 +59,7 @@ def index(request):
                               "grade": child.grade,
                               "section": child.section,
                               "tag": child.tag.mac_address,
-                              "school": child.school.name,
-                              "id": child.id
+                              "school": child.school.name
                               }
                 tag_updates = TagUpdate.objects.filter(tag=child.tag,
                                                        time_stamp__date=datetime.date.today()).order_by("-time_stamp")
