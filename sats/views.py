@@ -704,7 +704,7 @@ def fetch_and_update(request):
     print "fetched and updated the db"
     return HttpResponseRedirect(reverse("start_autoload"))
 
-#remove later
+
 @csrf_exempt
 def start_autoload(request):
     if not request.user.is_superuser:
